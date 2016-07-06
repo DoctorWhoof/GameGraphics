@@ -1,6 +1,6 @@
 #GameGraphics
 
-A collection of game related drawing objects.
+A collection of game related drawing objects for the Monkey2 programming language (http://http://monkey2.monkey-x.com)
 
 - Sprite: A basic sprite system featuring spritesheet loading, easy texture filtering, animation clips (series of frames played back sequentially) and playback framerate.
 
