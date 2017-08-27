@@ -39,8 +39,8 @@ Class BGWindow Extends Window
 
 	Method New()					
 		Super.New( "Test", 1280, 720, WindowFlags.Resizable )
-		bg = New Background( "asset::starfield.png", False )
-		grid = New Background( "asset::grid.png", False )
+		bg = New Background( "asset::starfield.png", True )
+		grid = New Background( "asset::grid.png", True )
 		parallaxCam = New Rect<Double>( 0, 0, Width, Height )
 		bg.Handle = New Vec2f( 0, 0 )
 '   		bg.debug = True

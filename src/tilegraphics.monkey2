@@ -19,6 +19,8 @@ Class TileGraphics Extends GameGraphics Abstract
 	Field tileEndY:Int
 
 	Method GetVisibleTiles( x:Double, y:Double, scale:Double, camera:Rect<Double> )
+	
+		'Populates tileStartX, tileStartY, tileEndX and tileEndY
 
 		tileWidth = images[0].Width * scale
 		tileHeight = images[0].Height * scale

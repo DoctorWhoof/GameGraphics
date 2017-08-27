@@ -1,0 +1,9 @@
+{
+	"emscripten":{
+		"Application Name":"Background_test"
+	},
+	"macos":{
+		"Application Name":"Background_test",
+		"Application Type":"gui"
+	}
+}

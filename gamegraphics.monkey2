@@ -42,12 +42,12 @@ Class GameGraphics Abstract
 	Method LoadFrames:Image[] ( path:String, numFrames:Int, cellWidth:Int, cellHeight:Int, filter:Bool = True, padded:Bool = False )
 	
 		Local flags :TextureFlags = Null
-		If filter Then flags |= TextureFlags.Filter
 		
 		Local atlasTextture := Texture.Load( path, flags )
 		Assert( atlasTextture, " ~n ~nGameGraphics: Image " + path + " not found.~n ~n" )
 		
 		Local atlasImg := New Image( atlasTextture )
+		If Not filter Then atlasImg.TextureFilter = TextureFilter.Nearest
 		Local imgs := New Image[ numFrames ]
 
 		If cellHeight = atlasImg.Height
@@ -66,17 +66,20 @@ Class GameGraphics Abstract
 			Local x:= 0
 			Local width:= cellWidth
 			Local y:= 0
-			Local height:= cellHeight
-			Local columns:= atlasImg.Width / width
+			Local height:Int= cellHeight
+			Local columns:Int = atlasImg.Width / width
 			If padded
 				x += 1
 				y += 1
 				width -= 2
 				height -= 2
 			End If
+			Local fx := 0
+			Local fy := 0
 			For Local i:= 0 Until numFrames
-				Local fx := i Mod columns * cellWidth
-				Local fy := i / columns * cellHeight
+				Local col := i Mod columns 
+				fx = col * cellWidth
+				fy = ( i / columns ) * cellHeight
 				imgs[i] = New Image( atlasImg, New Recti( fx + x, fy + y, fx + cellWidth, fy + cellHeight ) )
 			Next
 		Endif

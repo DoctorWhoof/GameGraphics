@@ -16,19 +16,18 @@ Class Sprite Extends GameGraphics
 	Field _duration:Int				'how long the current animation clip is
 	Field _frame:Int				'current frame being played
 	Field _startTime:Int			'keeps track of when the last Reset() ocurred
-	Field _anim := ""				'The animation clip last played
+	Field _anim :AnimationClip		'The animation clip last played
 
 	Public
 	
-	'************************************* Instance Properties *************************************
+	'************************************* Public Properties *************************************
 	
 	'Current frame
 	Property Frame:Int()
 		Return _frame
 	End
 
-
-	'************************************* Instance Methods *************************************
+	'************************************* Public Methods *************************************
 
 	'Loads images[] and initializes itself
 	Method New( ImagePath:String, Totalframes:Int=1, cellWidth:Int, cellHeight:Int, filter:Bool = True )
@@ -42,43 +41,36 @@ Class Sprite Extends GameGraphics
 		_startTime = Millisecs()
 	End
 
-	'main drawing. You can override the time to offset instances of the same sprite.
+	'main drawing. 
 	Method Draw( canvas:Canvas, anim:String, x:Float, y:Float, rotation:Float = 0.0, scaleX:Float = 1.0, scaleY:Float = 1.0, time:Int = -1 )
-
-		Local _anim := animations.Get( anim )
-	
-		If debug Or Not _anim
+		_anim = animations.Get( anim )
+		If Not _anim
 			Local w := images[ _frame ].Width
 			Local h := images[ _frame ].Height
-			DrawOutline( canvas, x, y, w, h , rotation, scaleX, scaleY )
-		End
-		If Not _anim
 			canvas.DrawText( "Sprite: AnimationClip '" + anim + "' is undefined", x, y )
+			DrawOutline( canvas, x, y, w, h, rotation, scaleX, scaleY )
 			Return
 		End
-		
-		'Override _time with any time value above -1
-		If time < 0
-			_time = Millisecs() - _startTime
-		Else
-			_time = time 
-		End
-		_period = ( 1000 / frameRate ) / timeScale	
-
-		If _anim.loop
-			_listFrame = _time Mod ( _anim.frame.Length * _period )
-			_clampedListFrame = Clamp( _listFrame/_period, 0, _anim.frame.Length - 1 )			
-		Else
-			_clampedListFrame = Clamp( _time/_period, 0, _anim.frame.Length - 1 )
-		End
-		
-		_frame = _anim.frame[ _clampedListFrame ]
-
+		UpdateTiming( time )
 		If images
 			canvas.DrawImage( images[ _frame ], x, y, rotation, scaleX, scaleY )
 		Else
 			canvas.DrawText( "Sprite: No image loaded", x, y )
-		End		
+		End
+	End
+	
+	Method DrawRect( canvas:Canvas, anim:String, x0:Float, y0:Float, width:Float, height:Float, time:Int = -1 )
+		_anim = animations.Get( anim )
+		If Not _anim
+			canvas.DrawText( "Sprite: AnimationClip '" + anim + "' is undefined", x0, y0 )
+			Return
+		End
+		UpdateTiming( time )
+		If images
+			canvas.DrawRect( x0, y0, width, height, images[ _frame ] )
+		Else
+			canvas.DrawText( "Sprite: No image loaded", x0, y0 )
+		End
 	End
 
 	'How long this animation clip is in milliseconds
@@ -96,6 +88,31 @@ Class Sprite Extends GameGraphics
 		animClip.loop = _loop
 		animClip.frame = _frames
 		animations.Add( _id, animClip )
+	End
+	
+
+	'************************************* Private Methods *************************************\
+	
+	Protected
+
+	'Main timing calculations. Always call before drawing.
+	'Use time = -1 for normal, frame rate based calculations, otherwise You can override the time to offset instances of the same sprite.
+	Method UpdateTiming( time:Int = -1 )
+		If time < 0
+			_time = Millisecs() - _startTime
+		Else
+			_time = time 
+		End
+		_period = ( 1000 / frameRate ) / timeScale	
+
+		If _anim.loop
+			_listFrame = _time Mod ( _anim.frame.Length * _period )
+			_clampedListFrame = Clamp( _listFrame/_period, 0, _anim.frame.Length - 1 )			
+		Else
+			_clampedListFrame = Clamp( _time/_period, 0, _anim.frame.Length - 1 )
+		End
+		
+		_frame = _anim.frame[ _clampedListFrame ]	
 	End
 
 End
